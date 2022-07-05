@@ -309,8 +309,8 @@ function Dashboard({ account }) {
                                                             name="FullName"
                                                             value={_fullName}
                                                             onChange={(e) => set_FullName(e.target.value)}
-                                                            pattern="[A-Za-z]{2}"
-                                                            required
+                                                            pattern= "[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
+                                                            
                                                         // ref={_fullName.value}
                                                         />
                                                         <div className="form__input-after"></div>
@@ -371,7 +371,7 @@ function Dashboard({ account }) {
                                                             value={_city}
                                                             onChange={(e) => set_City(e.target.value)}
                                                         // ref={_city}
-                                                        pattern="([A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2})"
+                                                        pattern="[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
                                                         />
                                                         <div className="form__input-after"></div>
                                                         <label className="form__label" for="City">
