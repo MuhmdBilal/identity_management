@@ -59,7 +59,7 @@ function App() {
       } */}
 
       <BrowserRouter>
-        <Navbars />
+        <Navbars  isDispaly={isDispaly}/>
         <Routes>
 
           {

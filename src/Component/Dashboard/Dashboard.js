@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import "../Login/Login.css"
+import "./Dashboard.css"
 import { create } from "ipfs-http-client";
 const client = create("https://ipfs.infura.io:5001/api/v0");
 function Dashboard({ account }) {
@@ -71,35 +72,131 @@ function Dashboard({ account }) {
     let [_gender, set_Gender] = useState('')
     let [_religion, set__Religion] = useState('')
     let [data, setData] = useState([])
+    let idFront1 = useRef()
+    let idBack1 = useRef()
     const [modalShow, setModalShow] = useState(false);
 
 
-    const [Url, setUrl] = useState(``);
-    const [isUrl, setIsUrl] = useState(``);
-    async function onChange(e) {
-        const file = e.target.files[0];
+    const [Url, setUrl] = useState('');
+    const [isUrl, setIsUrl] = useState('');
+    const [idFront, setIdFront] = useState(``)
+    const [idBack, setIdBack] = useState(``)
+    //  function onChange(e) {
+    //     setUrl(e.target.files[0]);
+    //     setIdFront(URL.createObjectURL(e.target.files[0]));
+    //     console.log("oneUrl", idFront);
+    // }
+    //  function isOnChange(e) {
+    //     setIsUrl(e.target.files[0]);
+    //     setIdBack(URL.createObjectURL(e.target.files[0]));
+    //     console.log("oneIsUrl", idBack);
+    // }
+   
+
+   
+
+
+    const UpdateSubmits = async (e) => {
+        e.preventDefault();
         try {
-            const added = await client.add(file);
-            const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-            setUrl(url);
-            console.log("Url", url);
-        } catch (error) {
-            console.log("Error uploading file: ", error);
-        }
-    }
-    async function isOnChange(e) {
-        const file = e.target.files[0];
-        try {
-            const added = await client.add(file);
-            const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-            setIsUrl(url);
-            console.log("isUrl", url);
-        } catch (error) {
-            console.log("Error uploading file: ", error);
+            let web3 = window.web3;
+            let add = await loadAccountAddress()
+            let contractOf = new web3.eth.Contract(contractAbi, contractAddress);
+            if(idFront1.current.files.length && idBack1.current.files.length){
+                let frontId = idFront1.current.files[0]
+                let backId = idBack1.current.files[0]
+                console.log("Url", Url);
+                const added = await client.add(frontId);
+                const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+                setIdFront(url)
+                console.log("url1", idFront);
+                const addeds = await client.add(backId);
+                const urls = `https://ipfs.infura.io/ipfs/${addeds.path}`;
+                setIdBack(urls)
+                console.log("isUrl1", idBack);
+               
+                let UpdateUserInfo = await contractOf.methods.UpdateUserInfo(_fullName, _zip, _dOB, _emailId, _userAddress, _city, _gender, _religion, url, urls).send({
+                    from: add
+                })
+                console.log("UpdateUserInfo", UpdateUserInfo);
+                toast.success("✔️ data updated successfully");
+                setModalShow(false)
+                dispalyData()
+                resetField("fullName");
+                resetField("email");
+                resetField("birthday")
+                resetField("address")
+                resetField("city")
+                resetField("zip")
+                resetField("gender")
+                resetField("religion")
+            }else if(idFront1.current.files.length){
+                let frontId = idFront1.current.files[0]
+                const added = await client.add(frontId);
+                const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+                setIdFront(url)
+                let UpdateUserInfo = await contractOf.methods.UpdateUserInfo(_fullName, _zip, _dOB, _emailId, _userAddress, _city, _gender, _religion, url, idBack).send({
+                    from: add
+                })
+                console.log("UpdateUserInfo", UpdateUserInfo);
+                toast.success("✔️ data updated successfully");
+                setModalShow(false)
+                dispalyData()
+                resetField("fullName");
+                resetField("email");
+                resetField("birthday")
+                resetField("address")
+                resetField("city")
+                resetField("zip")
+                resetField("gender")
+                resetField("religion")
+            } else if (idBack1.current.files.length){
+                let backId = idBack1.current.files[0]
+                const addeds = await client.add(backId);
+                const urls = `https://ipfs.infura.io/ipfs/${addeds.path}`;
+                setIdBack(urls) 
+                let UpdateUserInfo = await contractOf.methods.UpdateUserInfo(_fullName, _zip, _dOB, _emailId, _userAddress, _city, _gender, _religion, idFront, urls).send({
+                    from: add
+                })
+                console.log("UpdateUserInfo", UpdateUserInfo);
+                toast.success("✔️ data updated successfully");
+                setModalShow(false)
+                dispalyData()
+                resetField("fullName");
+                resetField("email");
+                resetField("birthday")
+                resetField("address")
+                resetField("city")
+                resetField("zip")
+                resetField("gender")
+                resetField("religion")
+            } else {
+                let UpdateUserInfo = await contractOf.methods.UpdateUserInfo(_fullName, _zip, _dOB, _emailId, _userAddress, _city, _gender, _religion, idFront, idBack).send({
+                    from: add
+                })
+                console.log("UpdateUserInfo", UpdateUserInfo);
+                toast.success("✔️ data updated successfully");
+                setModalShow(false)
+                dispalyData()
+                resetField("fullName");
+                resetField("email");
+                resetField("birthday")
+                resetField("address")
+                resetField("city")
+                resetField("zip")
+                resetField("gender")
+                resetField("religion")
+            }
+            
+            // window.location.reload(false);
+        } catch (e) {
+            console.log("e", e);
+            toast.error("❌ data Can't update");
         }
     }
     const dispalyData = async () => {
         try {
+
             let web3 = window.web3;
 
             let newArr = []
@@ -109,7 +206,10 @@ function Dashboard({ account }) {
             let _UserMap = await contractOf.methods._UserMap(account).call()
             // console.log("city", UserMap);
             console.log("_city", _UserMap);
-
+            // const url = `https://ipfs.infura.io/ipfs/${UserMap.idFront}`;
+            // setIdFront(url)
+            // const urls = `https://ipfs.infura.io/ipfs/${_UserMap.IdBack}`;
+            // setIdFront(urls)
             let address = UserMap.useraddress
             let name = UserMap.FullName
             let dob = UserMap.DoB
@@ -120,6 +220,7 @@ function Dashboard({ account }) {
             let gender = _UserMap.gender
             let religion = _UserMap.religion
             let IdBack = _UserMap.IdBack;
+            console.log(IdBack);
             let TotalData = { address: address, name: name, dob: dob, email: email, city: city, zip: zip, gender: gender, religion: religion, Idfront: Idfront, IdBack: IdBack }
             console.log("TotalData", TotalData);
             set_FullName(name)
@@ -130,8 +231,8 @@ function Dashboard({ account }) {
             set_Zip(zip)
             set_Gender(gender)
             set__Religion(religion)
-            setUrl(Idfront)
-            setIsUrl(IdBack)
+            setIdFront(Idfront)
+            setIdBack(IdBack)
             // set_DoB(dob)
             // _fullName = name
             console.log("_fullName", _fullName);
@@ -142,71 +243,26 @@ function Dashboard({ account }) {
         }
     }
 
+const logout=()=>{
+    localStorage.clear();
+        window.location.href = '/';
+}
 
-    // const showData = async () => {
-
-    //     try {
-    //         let web3 = window.web3;
-    //         // 
-    //         let contractOf = new web3.eth.Contract(contractAbi, contractAddress);
-    //         let UserMap = await contractOf.methods.UserMap(account).call()
-    //         let _UserMap = await contractOf.methods._UserMap(account).call()
-    //         let address = UserMap[0]
-    //         let name = UserMap[1]
-    //         let dob = UserMap[2]
-    //         let email = UserMap[3]
-    //         let city = UserMap[4]
-    //         let Idfront = UserMap[5]
-    //         let zip = _UserMap.zip
-    //         let gender = _UserMap.gender
-    //         let religion = _UserMap.religion
-    //         let IdBack = _UserMap.IdBack;
-
-    //         setModalShow(true)
-    //         console.log("_fullName", _fullName);
-    //     } catch (e) {
-    //         console.log("e", e);
-    //     }
-    // }
-
-
-    const UpdateSubmits = async (e) => {
-        e.preventDefault();
-        try {
-            let web3 = window.web3;
-            let add = await loadAccountAddress()
-            let contractOf = new web3.eth.Contract(contractAbi, contractAddress);
-            let UpdateUserInfo = await contractOf.methods.UpdateUserInfo(_fullName, _zip, _dOB, _emailId, _userAddress, _city, _gender, _religion, Url, isUrl).send({
-                from: add
-            })
-            console.log("UpdateUserInfo", UpdateUserInfo);
-            toast.success("✔️ data updated successfully");
-            setModalShow(false)
-            dispalyData()
-            resetField("fullName");
-            resetField("email");
-            resetField("birthday")
-            resetField("address")
-            resetField("city")
-            resetField("zip")
-            resetField("gender")
-            resetField("religion")
-            // window.location.reload(false);
-        } catch (e) {
-            console.log("e", e);
-            toast.error("❌ data Can't update");
-        }
-    }
     useEffect(() => {
         dispalyData()
     }, [])
 
     return (
-        <div className='' style={{ background: "rgb(23, 23, 24)", height: "150vh" }}>
+        <div className='' style={{ background: "rgb(23, 23, 24)", height: "auto" }}>
             <div className='container'>
                 <div className='row d-flex justify-content-center pt-3'>
                     <div className='col-12'>
                         <h2>User Information</h2>
+                    </div>
+                </div>
+                <div className='row'>
+                    <div className='col-12 d-flex justify-content-end'>
+                    <button className='btn btn-success' onClick={()=>logout()}>logout</button>
                     </div>
                 </div>
                 <div className='row d-flex justify-content-center'>
@@ -309,7 +365,7 @@ function Dashboard({ account }) {
                                                             name="FullName"
                                                             value={_fullName}
                                                             onChange={(e) => set_FullName(e.target.value)}
-                                                            pattern= "[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
+                                                            pattern= "[^,\s][^,]*[^,\s]*"
                                                             
                                                         // ref={_fullName.value}
                                                         />
@@ -318,11 +374,11 @@ function Dashboard({ account }) {
                                                             Full Name
                                                         </label>
                                                     </div>
-                                                    <div className="form__group">
+                                                    <div className="form__group form-data2">
                                                         <MdOutlineDateRange className="form__icon" />
                                                         <input
                                                             className="form__input"
-                                                            type="text"
+                                                            type="date"
                                                             name="birthday"
                                                             value={_dOB}
                                                             onChange={(e) => set_DoB(e.target.value)}
@@ -371,7 +427,7 @@ function Dashboard({ account }) {
                                                             value={_city}
                                                             onChange={(e) => set_City(e.target.value)}
                                                         // ref={_city}
-                                                        pattern="[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
+                                                        pattern="[^,\s][^,]*[^,\s]*"
                                                         />
                                                         <div className="form__input-after"></div>
                                                         <label className="form__label" for="City">
@@ -441,6 +497,7 @@ function Dashboard({ account }) {
                                                             name="religion"
                                                             value={_religion}
                                                             onChange={(e) => set__Religion(e.target.value)}
+                                                            pattern="[^,\s][^,]*[^,\s]*"
                                                         // ref={_religion}
                                                         />
                                                         <div className="form__input-after"></div>
@@ -456,10 +513,11 @@ function Dashboard({ account }) {
                                                             type="file"
                                                             id="img1"
                                                             name="img1"
-                                                            onChange={onChange}
+                                                            onChange={(e)=>setIdFront(URL.createObjectURL(e.target.files[0]))}
+                                                            ref={idFront1}
                                                         />
                                                     </div>
-                                                    <div>{Url && <img src={Url} width="300px" />}</div>
+                                                    <div>{idFront && <img src={idFront} width="300px" />}</div>
                                                     <div className="form__group">
                                                         {/* <FaDotCircle className="form__icon" size={10}/> */}
                                                         <label for="img">IdBack</label>&nbsp;
@@ -468,10 +526,11 @@ function Dashboard({ account }) {
                                                             id="img"
                                                             name="img"
 
-                                                            onChange={isOnChange}
+                                                            onChange={(e)=>setIdBack(URL.createObjectURL(e.target.files[0]))}
+                                                            ref={idBack1}
                                                         />
                                                     </div>
-                                                    <div>{isUrl && <img src={isUrl} width="300px" />}</div>
+                                                    <div>{idBack && <img src={idBack} width="300px" />}</div>
                                                     <div className="form__group">
                                                         <button className="form__btn" type='submit'>
                                                             <span className="form__btn-text">Update Data</span>

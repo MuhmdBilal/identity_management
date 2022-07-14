@@ -1,0 +1,4 @@
+.form-data2 input[type = "date"]::-webkit-calendar-picker-indicator {
+    color-scheme: dark !important;
+    color: white !important;
+} 

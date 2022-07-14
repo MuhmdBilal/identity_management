@@ -4,7 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Modal from 'react-bootstrap/Modal';
 import {loadWeb3} from "../../Component/Apis/Apis"
-function Navbars() {
+function Navbars({isDispaly}) {
     
     return (
         <div> <Navbar collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#0d1f45"}}>
@@ -16,6 +16,9 @@ function Navbars() {
 
                     </Nav>
                     <Nav>
+                        {/* {!isDispaly && <>
+                       
+                        </>} */}
                         {/* <button className='btn btn-secondary' onClick={()=>setModalShow(true)}>
                             {account }
                         </button> */}

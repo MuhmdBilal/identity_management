@@ -40,29 +40,24 @@ function SignUp({ account }) {
     // let gender = useRef('')
     let [gender, setgender] = useState('')
     // let religion = useRef('')
-    const [fileUrl, updateFileUrl] = useState(``)
-    const [isFileUrl, setIsFileUrl] = useState(``);
-    async function onChange(e) {
-        const file = e.target.files[0];
-        try {
-            const added = await client.add(file);
-            const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-            updateFileUrl(url);
-            console.log("url", url);
-        } catch (error) {
-            console.log("Error uploading file: ", error);
-        }
+    const [file, setFile] = useState(``)
+    const [file2, setFile2] = useState(``)
+    const [idFront, setIdFront] = useState(``)
+    const [idBack, setIdBack] = useState(``)
+    // const [fileUrl, updateFileUrl] = useState(``)
+    // const [oneFileUrl, updateOneFileUrl] = useState(``)
+    // const [isFileUrl, setIsFileUrl] = useState(``);
+    // const [oneIsFileUrl,setOneIsFileUrl] = useState(``)
+     const onChange=(e)=> {
+
+        setFile(e.target.files);
+        setIdBack(URL.createObjectURL(e.target.files[0]));
+        // console.log("fileUrl", fileUrl);
     }
-    async function isOnChange(e) {
-        const file = e.target.files[0];
-        try {
-            const added = await client.add(file);
-            const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-            setIsFileUrl(url);
-            console.log("url", url);
-        } catch (error) {
-            console.log("Error uploading file: ", error);
-        }
+    const isOnChange=(e)=> {
+        setFile2(e.target.files);
+        setIdFront(URL.createObjectURL(e.target.files[0]));
+        // console.log("isFileUrl",isFileUrl);
     }
     const fullNameHandle = (e) => {
         let items = e.target.value
@@ -77,20 +72,23 @@ function SignUp({ account }) {
     const handleSubmits = async (e) => {
         e.preventDefault();
         try {
+            const added = await client.add(file);
+            const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+            setIdBack(url)
+            // updateOneFileUrl(url);
+            // console.log("url", url);
+            // console.log("fileUrl", fileUrl);
+
+            const addeds = await client.add(file2);
+            const urls = `https://ipfs.infura.io/ipfs/${addeds.path}`;
+            setIdFront(urls)
+            // setOneIsFileUrl(urls);
+            // console.log("url", urls);
+            // console.log("isFileUrl",isFileUrl);
             let add = await loadAccountAddress()
-            console.log("fullName", fullName);
-            console.log("dOB", dOB);
-            // let full_name = fullName.current.value;
-            // let birthday = dOB.current.value;
-            // let email_Id = emailId.current.value;
-            // let user_address = userAddress.current.value;
-            // let City = city.current.value;
-            // let zip_code = zip.current.value;
-            // let Gender = gender.current.value;
-            // let Religion = religion.current.value;
             let web3 = window.web3;
             let contractOf = new web3.eth.Contract(contractAbi, contractAddress);
-            let AddUser = await contractOf.methods.AddUser(fullName, dOB, emailId, userAddress, city, zip, gender, religion, isFileUrl, fileUrl).send({
+            let AddUser = await contractOf.methods.AddUser(fullName, dOB, emailId, userAddress, city, zip, gender, religion, url, urls).send({
                 from: add
             })
             console.log("AddUser", AddUser);
@@ -136,16 +134,16 @@ function SignUp({ account }) {
                                     value={fullName}
                                     onChange={fullNameHandle}
                                     required
-                                    pattern="[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
+                                    pattern="[^,\s][^,]*[^,\s]*"
                                 />
                             </div>
                             {fullnameError ? <span>Full name is mandatory</span> : ""}
                         </div>
 
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="date" class="form-label form-heading lable-text">Date of Bitrh </label>
-                                <input type="date" class="form-control input-color"
+                            <div className="mb-4">
+                                <label for="date" className="form-label form-heading lable-text">Date of Bitrh </label>
+                                <input type="date" className="form-control input-color"
                                     // ref={dOB}
                                     value={dOB}
                                     required
@@ -156,9 +154,9 @@ function SignUp({ account }) {
                             </div>
                         </div>
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="username" class="form-label form-heading lable-text">Email Id</label>
-                                <input type="text" placeholder="Type your email address" class="form-control input-color"
+                            <div className="mb-4">
+                                <label for="username" className="form-label form-heading lable-text">Email Id</label>
+                                <input type="text" placeholder="Type your email address" className="form-control input-color"
                                     // ref={emailId}
                                     value={emailId}
                                     required
@@ -169,9 +167,9 @@ function SignUp({ account }) {
                             </div>
                         </div>
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="password" class="form-label form-heading lable-text">Address</label>
-                                <input type="text" placeholder="Enter Address" class="form-control input-color"
+                            <div className="mb-4">
+                                <label for="password" className="form-label form-heading lable-text">Address</label>
+                                <input type="text" placeholder="Enter Address" className="form-control input-color"
                                     // ref={userAddress}
                                     value={userAddress}
                                     required
@@ -181,22 +179,22 @@ function SignUp({ account }) {
                             </div>
                         </div>
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="password" class="form-label form-heading lable-text">City</label>
-                                <input type="text" placeholder="Enter City" class="form-control input-color"
+                            <div className="mb-4">
+                                <label for="password" className="form-label form-heading lable-text">City</label>
+                                <input type="text" placeholder="Enter City" className="form-control input-color"
                                     // ref={city}
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
                                     required
-                                    pattern="[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
+                                    pattern="[^,\s][^,]*[^,\s]*"
                                 />
                                
                             </div>
                         </div>
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="password" class="form-label form-heading lable-text">Zip Code</label>
-                                <input type="text" placeholder="Enter City" class="form-control input-color"
+                            <div className="mb-4">
+                                <label for="password" className="form-label form-heading lable-text">Zip Code</label>
+                                <input type="text" placeholder="Enter City" className="form-control input-color"
                                     // ref={zip}
                                     value={zip}
                                     required
@@ -208,44 +206,58 @@ function SignUp({ account }) {
                             </div>
                         </div>
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="password" class="form-label form-heading lable-text">Gender</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                            <div className="mb-4">
+                                <label for="password" className="form-label form-heading lable-text">Gender</label>
+                                <div className="form-check">
+                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
                                         checked={gender === 'male'} 
                                         value="male" onChange={(e) => setgender(e.target.value)}/>
-                                    <label class="form-check-label" for="flexRadioDefault1">
+                                    <label className="form-check-label" for="flexRadioDefault1">
                                         Male
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
+                                <div className="form-check">
+                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
                                         checked={gender === 'female'}
                                         value="female" onChange={(e) => setgender(e.target.value)}   />
-                                    <label class="form-check-label" for="flexRadioDefault2" >
+                                    <label className="form-check-label" for="flexRadioDefault2" >
                                         Female
                                     </label>
                                 </div>
                             </div>
                         </div>
                         <div className="col-md-4">
-                            <div class="mb-4">
-                                <label for="password" class="form-label form-heading lable-text">Religion</label>
-                                <input type="text" placeholder="Enter Religion" class="form-control input-color"
-                                    // ref={religion}
+                            <div className="mb-4">
+                                <label for="password" className="form-label form-heading lable-text">Religion</label>
+                                <input type="text" placeholder="Enter Religion" className="form-control input-color"
+                                    // ref={zip}
+                                    // value={zip}
                                     required
                                     value={religion}
                                     onChange={(e) => setReligion(e.target.value)}
-                                    pattern="[A-Za-z]+(?: [A-Za-z]+)*),? ([A-Za-z]{2}"
+                                    pattern="[^,\s][^,]*[^,\s]*"
                                 />
+                                
                             </div>
                         </div>
-                        <div className="col-md-5">
-                            <div class="mb-3">
-                                <label for="formFile" class="form-label">ID Front Side</label>
-                                <input class="form-control" type="file" id="formFile" required onChange={isOnChange} />
+                        {/* <div className="col-md-4">
+                            <div className="mb-4">
+                                <label for="password" classname="form-label form-heading lable-text">Religion</label>
+                                <input type="text" placeholder="Enter Religion" classname="form-control "
+                                   
+                                    required
+                                    value={religion}
+                                    onChange={(e) => setReligion(e.target.value)}
+                                    pattern="[^,\s][^,]*[^,\s]*"
+                                />
                             </div>
-                            <div>{isFileUrl && <img src={isFileUrl} width="300px" />}</div>
+                        </div> */}
+                        <div className="col-md-5">
+                            <div className="mb-3">
+                                <label for="formFile" className="form-label">ID Front Side</label>
+                                <input className="form-control" type="file" id="formFile" required onChange={isOnChange} />
+                            </div>
+                            <div>{idFront && <img src={idFront} width="300px" />}</div>
                             {/* <div class="mb-4">
                                 <label for="password" class="form-label form-heading lable-text">Religion</label>
                                 <input type="text" placeholder="Enter Religion" class="form-control input-color"
@@ -255,18 +267,12 @@ function SignUp({ account }) {
                             </div> */}
                         </div>
                         <div className="col-md-5">
-                            <div class="mb-3">
-                                <label for="formFile" class="form-label">ID Back Side</label>
-                                <input class="form-control" type="file" id="formFile" required onChange={onChange} />
+                            <div className="mb-3">
+                                <label for="formFile" className="form-label">ID Back Side</label>
+                                <input className="form-control" type="file" id="formFile" required onChange={onChange} />
                             </div>
-                            <div>{fileUrl && <img src={fileUrl} width="300px" />}</div>
-                            {/* <div class="mb-4">
-                                <label for="password" class="form-label form-heading lable-text">Religion</label>
-                                <input type="text" placeholder="Enter Religion" class="form-control input-color"
-                                    {...register("religion", { required: true })}
-                                />
-                                {errors.religion && <> &nbsp;<span style={{ color: "red" }}>{errors.religion.message}</span></>}
-                            </div> */}
+                            <div>{idBack && <img src={idBack} width="300px" />}</div>
+                        
                         </div>
                         <Toaster />
                     </div>

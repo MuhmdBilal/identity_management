@@ -92,8 +92,8 @@ function Login({ account, setIsDispaly }) {
         <form className="form" onSubmit={handleSubmits}>
           <div className="row d-flex justify-content-center text-start ">
             <div className="col-md-6">
-              <div class="mb-4">
-                <label for="email" class="form-label form-heading lable-text">Email Id</label>
+              <div className="mb-4">
+                <label  className="form-label form-heading lable-text">Email Id</label>
                 <input  placeholder="Type your email address" 
                 className="form__input form-control"
                                 type="text"
@@ -109,9 +109,9 @@ function Login({ account, setIsDispaly }) {
           </div>
           <div className="row d-flex justify-content-center text-start ">
             <div className="col-md-6">
-              <div class="mb-4">
-                <label for="username" class="form-label form-heading lable-text">Passwordd</label>
-                <input type="text" placeholder="Type your email address" class="form-control input-color"
+              <div className="mb-4">
+                <label  className="form-label form-heading lable-text">Passwordd</label>
+                <input type="text" placeholder="Type your email address" className="form-control input-color"
                   // ref={emailId}
                   value={account}
                 />
@@ -133,10 +133,10 @@ function Login({ account, setIsDispaly }) {
             <p className="form__text">
               Don't have an account yet? Sign up from
               <Link to="/signup">
-                <a href="#" className="form__link">
+                {/* <a  className="form__link"> */}
                   {" "}
                   here
-                </a>
+                {/* </a> */}
               </Link>
             </p>
           </div>
